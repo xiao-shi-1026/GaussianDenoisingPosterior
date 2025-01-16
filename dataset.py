@@ -5,7 +5,7 @@ from torch.utils.data import Dataset
 
 
 class ImageDataset(Dataset):
-    def __init__(self, path: str, transform = None):
+    def __init__(self, path: str, device: torch.device, transform = None):
         self.path = path
         self.transform = transform
         self.image_files = [f for f in os.listdir(path)]

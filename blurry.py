@@ -2,7 +2,7 @@ import torch
 from torch import nn
 import scipy
 import numpy as np
-import cv2
+
 
 # from .base import H_functions
 
@@ -157,30 +157,29 @@ class Blurkernel(nn.Module):
         ybar = Sigma_plus * UT_y
         return ybar
     
-if __name__ == "__main__":
+def corrupt(im: torch.Tensor, device: torch.device):
     with torch.no_grad():
-        image_path = "/Users/sx/Desktop/GaussianDenoisingPosterior/butterfly.png"
-        im = cv2.imread(image_path)
-        im = cv2.cvtColor(im, cv2.COLOR_BGR2RGB) 
-        # device = torch.device('cuda')
-        
-        corruption = Blurkernel(blur_type='gaussian', 
-                                kernel_size=15, 
-                                std=25, 
-                                img_size = im.shape[0], 
-                                device=torch.device('cpu'))
-        org = im
-        im = torch.tensor(im).permute(2, 0, 1).unsqueeze(0).float() / 255.0  # [H, W, C] -> [N, C, H, W]
-        y = corruption.forward(im)
-        print(f"Blurred image tensor shape: {y.shape}")
 
-        # Tensor-> Numpy
-        y_image = y.squeeze(0).permute(1, 2, 0).numpy()  # [N, C, H, W] -> [H, W, C]
-        y_image = (y_image * 255).astype(np.uint8)
+        corruption = Blurkernel(blur_type = 'gaussian', 
+                                    kernel_size = 3, 
+                                    std = 10, 
+                                    img_size = im.shape[0], 
+                                    device = device)
+        im = im.to(device)
+        corruption = corruption.forward(im)
+        torch.cuda.empty_cache()
+        return corruption
 
-        save_path = "/Users/sx/Desktop/GaussianDenoisingPosterior/butterfly_blurred.png"
-        cv2.imwrite(save_path, cv2.cvtColor(y_image, cv2.COLOR_RGB2BGR))
-        print(f"Blurred image saved at: {save_path}")
-
+if __name__ == '__main__':
+    from dataset import ImageDataset
+    from torch.utils.data import DataLoader
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    train_path = r"C:\Users\sx119\Desktop\GaussianDenoisingPosterior\Data\train"
+    train_dataset = ImageDataset(train_path)
+    train_loader = DataLoader(dataset=train_dataset, batch_size=16, shuffle=True)
+    for batch_idx, (inputs, labels) in enumerate(train_loader):
+        print(batch_idx)
+        inputs, labels = inputs.to(device), labels.to(device)
+        inputs = corrupt(inputs, device).to(device)
 
     

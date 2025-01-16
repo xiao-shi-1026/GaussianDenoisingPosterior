@@ -4,7 +4,8 @@ from torch.nn.modules.loss import _Loss
 import torch.optim as optim
 from dataset import ImageDataset
 from torch.utils.data import DataLoader
-from blurry import Blurkernel
+from blurry import corrupt
+from tqdm import tqdm
 class sum_squared_error(_Loss):
     """
     Definition: sum_squared_error = 1/2 * nn.MSELoss(reduction = 'sum')
@@ -21,12 +22,12 @@ class sum_squared_error(_Loss):
 
 if __name__ == '__main__':
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    train_path = '/content/data/train'
-    test_path = '/content/data/validation'
+    train_path = r"C:\Users\sx119\Desktop\GaussianDenoisingPosterior\Data\train"
+    test_path = r"C:\Users\sx119\Desktop\GaussianDenoisingPosterior\Data\validation"
     train_dataset = ImageDataset(train_path)
-    train_loader = DataLoader(dataset=train_dataset, batch_size=16, shuffle=True)
+    train_loader = DataLoader(dataset=train_dataset, batch_size=4, shuffle=True)
     test_dataset = ImageDataset(test_path)
-    test_loader = DataLoader(dataset=test_dataset, batch_size=16, shuffle=False)
+    test_loader = DataLoader(dataset=test_dataset, batch_size=4, shuffle=False)
 
     model = DnCNN(in_nc=3, out_nc=3, nc=64, nb=20, act_mode='BR')
     criterion = sum_squared_error()
@@ -38,26 +39,26 @@ if __name__ == '__main__':
         print('start' + str(epoch) +'epochs')
         model.train()  # 设置为训练模式
         running_loss = 0.0
-        for batch_idx, (inputs, labels) in enumerate(train_loader):
-            inputs, labels = inputs.to(device), labels.to(device)
-            with torch.no_grad():
-                corruption = Blurkernel(blur_type = 'gaussian', 
-                                          kernel_size = 15, 
-                                          std = 25, 
-                                          img_size = inputs.shape[0], 
-                                          device = device)
-                inputs = corruption.forward(inputs)
-            # 前向传播
-            outputs = model(inputs)
-            loss = criterion(outputs, labels)
-
-            # 反向传播和优化
-            optimizer.zero_grad()
-            loss.backward()
-            optimizer.step()
-
-            running_loss += loss.item()
-        print(f"Epoch [{epoch+1}/{num_epochs}], Step [{batch_idx+1}/{len(train_loader)}], Loss: {loss.item():.4f}")
+        with tqdm(enumerate(train_loader), total=len(train_loader), desc=f"Epoch {epoch + 1}/{num_epochs}") as progress_bar:
+            for batch_idx, (inputs, labels) in enumerate(train_loader):
+                print('pass1')
+                inputs, labels = inputs.to(device), labels.to(device)
+                # inputs = corrupt(inputs, device).to(device)
+                # 前向传播
+                print(inputs.shape)
+                outputs = model(inputs)
+                print('pass3')
+                loss = criterion(outputs, labels)
+                print('pass4')
+                # 反向传播和优化
+                optimizer.zero_grad()
+                loss.backward()
+                optimizer.step()
+                print('pass5')
+                running_loss += loss.item()
+                progress_bar.set_postfix({"Loss": loss.item()})
+                torch.cuda.empty_cache()
+                print('pass6')
     print(f"Epoch [{epoch+1}/{num_epochs}] completed, Average Loss: {running_loss / len(train_loader):.4f}")
 
 # 6. 测试模型
