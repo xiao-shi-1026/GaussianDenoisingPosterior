@@ -26,21 +26,23 @@ if __name__ == '__main__':
     train_path = r"C:\Users\sx119\Desktop\GaussianDenoisingPosterior\Data\train"
     test_path = r"C:\Users\sx119\Desktop\GaussianDenoisingPosterior\Data\validation"
     train_dataset = ImageDataset(train_path, device, 128)
-    train_loader = DataLoader(dataset = train_dataset, batch_size = 16, shuffle = True)
-    test_dataset = ImageDataset(test_path, device, 128)
-    test_loader = DataLoader(dataset = test_dataset, batch_size = 16, shuffle = False)
+    train_loader = DataLoader(dataset=train_dataset, batch_size=32, shuffle=True)
+    test_dataset = ImageDataset(test_path, device, 1024)
+    test_loader = DataLoader(dataset=test_dataset, batch_size=4, shuffle=False)
 
-    model = DnCNN(in_nc = 3, out_nc = 3, nc = 64, nb = 20, act_mode = 'BR')
+    model = DnCNN(in_nc=3, out_nc=3, nc=64, nb=20, act_mode='BR')
     criterion = sum_squared_error()
     optimizer = optim.Adam(model.parameters(), lr=0.001)
     model = model.to(device)
     num_epochs = 5
 
     for epoch in range(num_epochs):
-        print('start' + str(epoch) +'epochs')
+        print(f'Starting epoch {epoch + 1}/{num_epochs}')
+        
+        # Training Loop
         model.train()  # Training mode
         running_loss = 0.0
-        with tqdm(train_loader, total=len(train_loader), desc=f"Epoch {epoch + 1}/{num_epochs}", dynamic_ncols=True) as progress_bar:
+        with tqdm(train_loader, total=len(train_loader), desc=f"Epoch {epoch + 1}/{num_epochs} (Training)", dynamic_ncols=True) as progress_bar:
             for batch_idx, (inputs, labels) in enumerate(progress_bar):
                 inputs, labels = inputs.to(device), labels.to(device)
                 outputs = model(inputs)
@@ -51,26 +53,43 @@ if __name__ == '__main__':
                 running_loss += loss.item()
                 progress_bar.set_postfix({"Loss": loss.item()})
                 torch.cuda.empty_cache()
+        
+        avg_train_loss = running_loss / len(train_loader)
+        print(f"Epoch {epoch + 1} Training Completed. Average Loss: {avg_train_loss:.4f}")
 
-    print(f"Epoch [{epoch+1}/{num_epochs}] completed, Average Loss: {running_loss / len(train_loader):.4f}")
+        # Validation Loop
+        model.eval()  # Evaluation mode
+        val_loss = 0.0
+        with torch.no_grad():
+            with tqdm(test_loader, total=len(test_loader), desc=f"Epoch {epoch + 1}/{num_epochs} (Validation)", dynamic_ncols=True) as progress_bar:
+                for inputs, labels in progress_bar:
+                    inputs, labels = inputs.to(device), labels.to(device)
+                    outputs = model(inputs)
+                    loss = criterion(outputs, labels)
+                    val_loss += loss.item()
+                    progress_bar.set_postfix({"Loss": loss.item()})
+        
+        avg_val_loss = val_loss / len(test_loader)
+        print(f"Epoch {epoch + 1} Validation Completed. Average Loss: {avg_val_loss:.4f}")
 
-# 6. 测试模型
-    model.eval()  # 设置为评估模式
+    print("Training and Validation Completed.")
+
+
+
+    model.eval()  
     total_loss = 0.0
     total_samples = 0
 
     sse_loss = sum_squared_error()
 
-    with torch.no_grad():  # 禁用梯度计算
+    with torch.no_grad():
         for inputs, labels in test_loader:
             inputs, labels = inputs.to(device), labels.to(device)
             outputs = model(inputs)
 
-            # 计算自定义的 SSE Loss
             loss = sse_loss(outputs, labels)
             total_loss += loss.item()
             total_samples += labels.size(0)
 
-    # 计算平均 SSE Loss
     average_sse_loss = total_loss / total_samples
     print(f"Average Sum Squared Error Loss of the model on the test set: {average_sse_loss:.4f}")
