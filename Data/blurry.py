@@ -2,11 +2,8 @@ import torch
 from torch import nn
 import scipy
 import numpy as np
-
-
-# from .base import H_functions
-
 from abc import ABC, abstractmethod
+
 class LinearOperator(ABC):
     @abstractmethod
     def forward(self, data, **kwargs):
@@ -159,27 +156,12 @@ class Blurkernel(nn.Module):
     
 def corrupt(im: torch.Tensor, device: torch.device):
     with torch.no_grad():
-
         corruption = Blurkernel(blur_type = 'gaussian', 
-                                    kernel_size = 3, 
-                                    std = 10, 
+                                    kernel_size = 15, 
+                                    std = 25, 
                                     img_size = im.shape[0], 
                                     device = device)
         im = im.to(device)
         corruption = corruption.forward(im)
         torch.cuda.empty_cache()
         return corruption
-
-if __name__ == '__main__':
-    from dataset import ImageDataset
-    from torch.utils.data import DataLoader
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    train_path = r"C:\Users\sx119\Desktop\GaussianDenoisingPosterior\Data\train"
-    train_dataset = ImageDataset(train_path)
-    train_loader = DataLoader(dataset=train_dataset, batch_size=16, shuffle=True)
-    for batch_idx, (inputs, labels) in enumerate(train_loader):
-        print(batch_idx)
-        inputs, labels = inputs.to(device), labels.to(device)
-        inputs = corrupt(inputs, device).to(device)
-
-    

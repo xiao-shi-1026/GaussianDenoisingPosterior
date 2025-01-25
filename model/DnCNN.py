@@ -1,6 +1,6 @@
 
 import torch.nn as nn
-import basicblock as B
+from . import basicblock as B
 
 
 """
@@ -21,10 +21,6 @@ import basicblock as B
 # --------------------------------------------
 """
 
-
-# --------------------------------------------
-# DnCNN
-# --------------------------------------------
 class DnCNN(nn.Module):
     def __init__(self, in_nc=1, out_nc=1, nc=64, nb=17, act_mode='BR'):
         """
@@ -57,15 +53,3 @@ class DnCNN(nn.Module):
     def forward(self, x):
         n = self.model(x)
         return x-n
-
-
-
-
-if __name__ == '__main__':
-
-    import torch
-    device = torch.device("cuda")
-    x = torch.randn((4, 3, 256, 256)).to(device)
-    model1 = DnCNN(in_nc=3, out_nc=3, nc=64, nb=20, act_mode='BR').to(device)
-    x1 = model1(x)
-    print(x1.shape)
