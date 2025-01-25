@@ -57,25 +57,6 @@ if __name__ == '__main__':
         avg_train_loss = running_loss / len(train_loader)
         print(f"Epoch {epoch + 1} Training Completed. Average Loss: {avg_train_loss:.4f}")
 
-        # Validation Loop
-        model.eval()  # Evaluation mode
-        val_loss = 0.0
-        with torch.no_grad():
-            with tqdm(test_loader, total=len(test_loader), desc=f"Epoch {epoch + 1}/{num_epochs} (Validation)", dynamic_ncols=True) as progress_bar:
-                for inputs, labels in progress_bar:
-                    inputs, labels = inputs.to(device), labels.to(device)
-                    outputs = model(inputs)
-                    loss = criterion(outputs, labels)
-                    val_loss += loss.item()
-                    progress_bar.set_postfix({"Loss": loss.item()})
-        
-        avg_val_loss = val_loss / len(test_loader)
-        print(f"Epoch {epoch + 1} Validation Completed. Average Loss: {avg_val_loss:.4f}")
-
-    print("Training and Validation Completed.")
-
-
-
     model.eval()  
     total_loss = 0.0
     total_samples = 0
