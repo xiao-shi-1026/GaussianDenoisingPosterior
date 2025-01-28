@@ -65,6 +65,6 @@ def plot_images(original_image, corrupted_tensor, denoised_image):
 
 if __name__ == "__main__":
     model_path = r"C:\Users\sx119\Desktop\GaussianDenoisingPosterior\outputs\deblurring\deblurring.pth"
-    image_path = r"C:\Users\sx119\Desktop\GaussianDenoisingPosterior\data\test_image.png.png"
+    image_path = r"C:\Users\sx119\Desktop\GaussianDenoisingPosterior\data\test_image.png"
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     inference_pipeline(model_path, image_path, device)

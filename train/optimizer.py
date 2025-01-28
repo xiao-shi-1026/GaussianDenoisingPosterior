@@ -38,7 +38,7 @@ def create_loss_function(name):
     if name == "cross_entropy":
         return nn.CrossEntropyLoss()
     elif name == "mse":
-        return nn.MSELoss()
+        return nn.MSELoss(size_average=False)
     elif name == "gdp_mse":
         return SumSquaredError()
     else:
