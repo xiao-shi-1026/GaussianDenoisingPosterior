@@ -1,13 +1,13 @@
 import torch
 from torchvision import transforms
 from PIL import Image
-from model.DnCNN import DnCNN
+from model.DnCNN import TestDnCNN
 from pathlib import Path
 import matplotlib.pyplot as plt
 from data.blurry import corrupt
-
+from data.utils import addnoise
 def load_model(model_class, model_path, device):
-    model = model_class(in_nc=3, out_nc=3, nc=64, nb=20, act_mode='BR')
+    model = model_class(channels = 3)
     model.load_state_dict(torch.load(model_path, map_location=device))
     model.to(device)
     model.eval()
@@ -33,11 +33,15 @@ def postprocess_output(output_tensor):
     return Image.fromarray(output_image)
 
 def inference_pipeline(model_path, image_path, device="cuda"):
-    model = load_model(DnCNN, model_path, device)
+    model = load_model(TestDnCNN, model_path, device)
 
     input_tensor, original_image = preprocess_image(image_path)
 
-    corrupted_tensor = corrupt(input_tensor, device)
+    input_tensor = input_tensor.to(device)
+
+    corrupted_tensor = addnoise(input_tensor, [15, 15], device)
+
+    corrupted_tensor = corrupt(corrupted_tensor, device)
 
     denoised_tensor = run_inference(model, corrupted_tensor, device)
 

@@ -3,11 +3,10 @@ import cv2
 import torch
 import numpy as np
 from torch.utils.data import Dataset
-from torchvision import transforms
-from .blurry import Blurkernel
 import h5py
 import glob
-from data.utils import data_augmentation
+import random
+from .utils import data_augmentation
 def normalize(data):
     return data / 255
 
@@ -49,7 +48,7 @@ def Im2Patch(img: np.array, patch_size: int, stride: int = 1) -> np.array:
             k = k + 1
     return Y.reshape([endc, patch_size, patch_size, TotalPatNum])
 
-def prepare_data(data_path: str, patch_size: int, stride: int, aug_times: int = 1):
+def prepare_data(data_path: str, patch_size: int, stride : int = 1, aug_times: int = 1, mode: str = 'deblurring'):
     """
     Generate training data and validation data. 
     Training data will go through patching and data augmentation, and validation will not.
@@ -59,6 +58,7 @@ def prepare_data(data_path: str, patch_size: int, stride: int, aug_times: int = 
         patch_size: the size of one patch
         stride: the stride of patches extraction. There's no overlap between patches if stride = patch_size
         aug_times: times of augments. default = 1
+        mode: the subproblem at current stage
     References:
         @article{zhang2017beyond,
         title={Beyond a gaussian denoiser: Residual learning of deep cnn for image denoising},
@@ -86,9 +86,9 @@ def prepare_data(data_path: str, patch_size: int, stride: int, aug_times: int = 
         h, w, c = img.shape
         for k in range(len(scales)):
             Img = cv2.resize(img, (int(h*scales[k]), int(w*scales[k])), interpolation=cv2.INTER_CUBIC)
-            Img = np.expand_dims(Img[:,:,0].copy(), 0)
+            Img = np.transpose(Img, (2, 0, 1))
             Img = np.float32(normalize(Img))
-            patches = Im2Patch(Img, win=patch_size, stride=stride)
+            patches = Im2Patch(Img, patch_size, stride)
             print("file: %s scale %.1f # samples: %d" % (files[i], scales[k], patches.shape[3]*aug_times))
             for n in range(patches.shape[3]):
                 data = patches[:,:,:,n].copy()
@@ -102,7 +102,7 @@ def prepare_data(data_path: str, patch_size: int, stride: int, aug_times: int = 
     # val
     print('\nprocess validation data')
     files.clear()
-    files = glob.glob(os.path.join(data_path, 'Set12', '*.png'))
+    files = glob.glob(os.path.join(data_path, 'validation', '*.png'))
     files.sort()
     h5f = h5py.File('val.h5', 'w')
     val_num = 0
@@ -119,36 +119,33 @@ def prepare_data(data_path: str, patch_size: int, stride: int, aug_times: int = 
 
 
 class ImageDataset(Dataset):
-    def __init__(self, path: str, device: torch.device, crop_size : int, mode: str):
-        self.path = path
-        self.transform = transforms.RandomCrop(crop_size)
-        self.image_files = [f for f in os.listdir(path)]
-        self.corruption = Blurkernel(blur_type = 'gaussian', 
+    def __init__(self, mode: str, train : bool = True):
+        self.train = train
+        if self.train:
+            h5f = h5py.File('train.h5', 'r')
+        else:
+            h5f = h5py.File('val.h5', 'r')
+        self.keys = list(h5f.keys())
+        random.shuffle(self.keys)
+        h5f.close()
+        """ self.corruption = Blurkernel(blur_type = 'gaussian', 
                                         kernel_size = 3, 
                                         std = 10, 
                                         img_size = crop_size, 
-                                        device = device)
+                                        device = device)"""
         self.mode = mode
     def __len__(self):
-        return len(self.image_files)
-    
-    def corrupt(self, im: torch.Tensor):
-        with torch.no_grad():
-            corruption = self.corruption.forward(im).to(self.corruption.device)
-            if torch.cuda.is_available() and self.corruption.device.type == "cuda":
-                torch.cuda.empty_cache()
-            return corruption
+        return len(self.keys)
     
     def __getitem__(self, idx):
-        img_path = os.path.join(self.path, self.image_files[idx])
-        image = cv2.imread(img_path)
-        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-
-        image = torch.tensor(image).permute(2, 0, 1).float() / 255.0 # (height, width, channels) -> (channels, height, width), normalize.
-        label = self.transform(image).to(self.corruption.device)
-        if self.mode == "cd":
-            im = self.corrupt(label)
+        if self.train:
+            h5f = h5py.File('train.h5', 'r')
         else:
-            return label, label
-        return im, label
-       
+            h5f = h5py.File('val.h5', 'r')
+        key = self.keys[idx]
+        data = np.array(h5f[key])
+        h5f.close()
+        return torch.Tensor(data), torch.Tensor(data)
+
+if __name__ == "__main__":
+    prepare_data(r"C:\Users\sx119\Desktop\gdp_data", 128, 100)

@@ -8,7 +8,7 @@ import yaml
 import os
 from train.optimizer import create_optimizer, create_scheduler, create_loss_function
 from data.utils import addnoise
-
+from data.blurry import corrupt
 
 if __name__ == '__main__':
     config_path = os.path.join(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")), "config.yaml")
@@ -24,8 +24,6 @@ if __name__ == '__main__':
         'validate_path' : os.path.join(config["path"]["input"], "validation"),
         'output_path' : config["path"]["output"],
         # batch set
-        'train_crop_size' : config["hyperparameter"]["train_crop"],
-        'validate_crop_size' : config["hyperparameter"]["vali_crop"],
         'train_batch_size' : config["hyperparameter"]["train_batch"],
         'validate_batch_size' : config["hyperparameter"]["vali_batch"],
         # optimizer
@@ -39,9 +37,9 @@ if __name__ == '__main__':
         'gamma' : config["scheduler"]["gamma"],
     }
 
-    train_dataset = ImageDataset(config_dict['train_path'], config_dict['device'], config_dict['train_crop_size'], config_dict['net_mode'])
+    train_dataset = ImageDataset(config_dict['net_mode'])
     train_loader = DataLoader(dataset=train_dataset, batch_size=config_dict['train_batch_size'], shuffle=True, num_workers=config_dict['num_workers'])
-    test_dataset = ImageDataset(config_dict['validate_path'], config_dict['device'], config_dict['validate_crop_size'], config_dict['net_mode'])
+    test_dataset = ImageDataset(config_dict['net_mode'])
     test_loader = DataLoader(dataset=test_dataset, batch_size=config_dict['validate_batch_size'], shuffle=False, num_workers=config_dict['num_workers'])
 
     # model = DnCNN(in_nc=3, out_nc=3, nc=64, nb=20, act_mode='BR')
@@ -67,6 +65,7 @@ if __name__ == '__main__':
         with tqdm(train_loader, total=len(train_loader), desc=f"Epoch {epoch + 1}/{num_epochs} (Training)", dynamic_ncols=True) as progress_bar:
             for batch_idx, (inputs, labels) in enumerate(progress_bar):
                 inputs, labels = inputs.to(config_dict['device']), labels.to(config_dict['device'])
+                inputs = corrupt(inputs, config_dict['device'])
                 inputs = addnoise(inputs, config_dict['noise_level'], config_dict['device'])
                 outputs = model(inputs)
                 loss = criterion(outputs, labels) / (inputs.size()[0]*2)
@@ -89,6 +88,7 @@ if __name__ == '__main__':
             with tqdm(test_loader, total=len(test_loader), desc=f"Epoch {epoch + 1}/{num_epochs} (Validation)", dynamic_ncols=True) as progress_bar:
                 for batch_idx, (inputs, labels) in enumerate(progress_bar):
                     inputs, labels = inputs.to(config_dict['device']), labels.to(config_dict['device'])
+                    inputs = corrupt(inputs, config_dict['device'])
                     inputs = addnoise(inputs, config_dict['noise_level'], config_dict['device'])
                     outputs = model(inputs)
                     loss = criterion(outputs, labels) / (inputs.size()[0]*2)

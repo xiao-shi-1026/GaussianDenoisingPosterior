@@ -15,14 +15,12 @@ path:
   output: C:\Users\sx119\Desktop\GaussianDenoisingPosterior\outputs\deblurring
 
 hyperparameter:
-  epochs: 20
-  train_batch: 56
-  vali_batch: 1
-  train_crop: 128
-  vali_crop: 1024
+  epochs: 40
+  train_batch: 72
+  vali_batch: 16
 
 num_workers:
-  num: 2
+  num: 4
 
 noise_level:
   start: 15
