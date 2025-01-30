@@ -1,7 +1,7 @@
 import torch
 from torchvision import transforms
 from PIL import Image
-from model.DnCNN import TestDnCNN
+from model.DnCNN import DnCNN
 from pathlib import Path
 import matplotlib.pyplot as plt
 from data.blurry import corrupt
@@ -33,7 +33,7 @@ def postprocess_output(output_tensor):
     return Image.fromarray(output_image)
 
 def inference_pipeline(model_path, image_path, device="cuda"):
-    model = load_model(TestDnCNN, model_path, device)
+    model = load_model(DnCNN, model_path, device)
 
     input_tensor, original_image = preprocess_image(image_path)
 

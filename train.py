@@ -1,6 +1,6 @@
 import torch
 # from model.DnCNN import DnCNN
-from model.DnCNN import TestDnCNN
+from model.DnCNN import DnCNN
 from data.dataset import ImageDataset
 from torch.utils.data import DataLoader
 from tqdm import tqdm
@@ -43,7 +43,7 @@ if __name__ == '__main__':
     test_loader = DataLoader(dataset=test_dataset, batch_size=config_dict['validate_batch_size'], shuffle=False, num_workers=config_dict['num_workers'])
 
     # model = DnCNN(in_nc=3, out_nc=3, nc=64, nb=20, act_mode='BR')
-    model = TestDnCNN(channels = 3)
+    model = DnCNN(channels = 3)
     criterion = create_loss_function(config_dict['loss'])
     optimizer = create_optimizer(model, config_dict['optimizer'], config_dict['learning_rate'])
     scheduler = create_scheduler(optimizer, config_dict['scheduler'], config_dict['step_size'], config_dict['gamma'])
