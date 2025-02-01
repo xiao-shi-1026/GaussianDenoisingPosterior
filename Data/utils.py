@@ -17,7 +17,7 @@ def addnoise(img_train: torch.Tensor, noiseL_B: list, device: torch.device) -> t
         noise[n,:,:,:] = torch.FloatTensor(sizeN).normal_(mean=0, std=stdN[n]/255.)
     return (img_train + noise.to(device)).clamp(0, 1) # limit to [0,1]
 
-def data_augmentation(image, mode):
+def data_augmentation(image: np.array, mode):
     """
     References:
         @article{zhang2017beyond,

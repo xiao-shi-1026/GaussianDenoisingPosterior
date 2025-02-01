@@ -1,11 +1,8 @@
-
 import torch.nn as nn
-from . import basicblock as B
-
 
 """
 # --------------------------------------------
-# DnCNN (20 conv layers)
+# DnCNN (17 conv layers)
 # --------------------------------------------
 # References:
 @article{zhang2017beyond,

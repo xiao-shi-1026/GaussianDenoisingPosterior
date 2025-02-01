@@ -11,12 +11,12 @@ loss:
   name: mse
 
 path:
-  input: C:\Users\sx119\Desktop\gdp_data
+  input: C:\Users\sx119\Desktop\GaussianDenoisingPosterior
   output: C:\Users\sx119\Desktop\GaussianDenoisingPosterior\outputs\deblurring
 
 hyperparameter:
   epochs: 40
-  train_batch: 72
+  train_batch: 16
   vali_batch: 16
 
 num_workers:

@@ -1,5 +1,4 @@
 import torch
-# from model.DnCNN import DnCNN
 from model.DnCNN import DnCNN
 from data.dataset import ImageDataset
 from torch.utils.data import DataLoader
@@ -7,8 +6,7 @@ from tqdm import tqdm
 import yaml
 import os
 from train.optimizer import create_optimizer, create_scheduler, create_loss_function
-from data.utils import addnoise
-from data.blurry import corrupt
+from data.blurring import corrupt
 
 if __name__ == '__main__':
     config_path = os.path.join(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")), "config.yaml")
@@ -20,8 +18,8 @@ if __name__ == '__main__':
         'noise_level' : [config["noise_level"]['start'], config["noise_level"]['end']],
         'net_mode': config["net_mode"]["mode"],
         # path
-        'train_path' : os.path.join(config["path"]["input"], "train"),
-        'validate_path' : os.path.join(config["path"]["input"], "validation"),
+        'train_path' : os.path.join(config["path"]["input"], "train.h5"),
+        'validate_path' : os.path.join(config["path"]["input"], "val.h5"),
         'output_path' : config["path"]["output"],
         # batch set
         'train_batch_size' : config["hyperparameter"]["train_batch"],
@@ -37,9 +35,9 @@ if __name__ == '__main__':
         'gamma' : config["scheduler"]["gamma"],
     }
 
-    train_dataset = ImageDataset(config_dict['net_mode'])
+    train_dataset = ImageDataset(config_dict['train_path'])
     train_loader = DataLoader(dataset=train_dataset, batch_size=config_dict['train_batch_size'], shuffle=True, num_workers=config_dict['num_workers'])
-    test_dataset = ImageDataset(config_dict['net_mode'])
+    test_dataset = ImageDataset(config_dict['validate_path'], False)
     test_loader = DataLoader(dataset=test_dataset, batch_size=config_dict['validate_batch_size'], shuffle=False, num_workers=config_dict['num_workers'])
 
     # model = DnCNN(in_nc=3, out_nc=3, nc=64, nb=20, act_mode='BR')
@@ -66,7 +64,7 @@ if __name__ == '__main__':
             for batch_idx, (inputs, labels) in enumerate(progress_bar):
                 inputs, labels = inputs.to(config_dict['device']), labels.to(config_dict['device'])
                 inputs = corrupt(inputs, config_dict['device'])
-                inputs = addnoise(inputs, config_dict['noise_level'], config_dict['device'])
+
                 outputs = model(inputs)
                 loss = criterion(outputs, labels) / (inputs.size()[0]*2)
 
@@ -89,7 +87,7 @@ if __name__ == '__main__':
                 for batch_idx, (inputs, labels) in enumerate(progress_bar):
                     inputs, labels = inputs.to(config_dict['device']), labels.to(config_dict['device'])
                     inputs = corrupt(inputs, config_dict['device'])
-                    inputs = addnoise(inputs, config_dict['noise_level'], config_dict['device'])
+
                     outputs = model(inputs)
                     loss = criterion(outputs, labels) / (inputs.size()[0]*2)
                     val_loss += loss.item()

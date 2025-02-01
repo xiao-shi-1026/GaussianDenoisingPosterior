@@ -4,7 +4,7 @@ from PIL import Image
 from model.DnCNN import DnCNN
 from pathlib import Path
 import matplotlib.pyplot as plt
-from data.blurry import corrupt
+from data.blurring import corrupt
 from data.utils import addnoise
 def load_model(model_class, model_path, device):
     model = model_class(channels = 3)
