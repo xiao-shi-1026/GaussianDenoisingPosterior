@@ -26,5 +26,5 @@ noise_level:
   start: 15
   end: 15
 
-net_mode:
-  mode: "d"
+net:
+  name: "UNet"

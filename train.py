@@ -1,5 +1,4 @@
 import torch
-from model.DnCNN import DnCNN
 from data.dataset import ImageDataset
 from torch.utils.data import DataLoader
 from tqdm import tqdm
@@ -16,7 +15,7 @@ if __name__ == '__main__':
         'epochs' : config["hyperparameter"]["epochs"],
         'num_workers' : config["num_workers"]["num"],
         'noise_level' : [config["noise_level"]['start'], config["noise_level"]['end']],
-        'net_mode': config["net_mode"]["mode"],
+        'net': config["net"]["name"],
         # path
         'train_path' : os.path.join(config["path"]["input"], "train.h5"),
         'validate_path' : os.path.join(config["path"]["input"], "val.h5"),
@@ -40,8 +39,15 @@ if __name__ == '__main__':
     test_dataset = ImageDataset(config_dict['validate_path'], False)
     test_loader = DataLoader(dataset=test_dataset, batch_size=config_dict['validate_batch_size'], shuffle=False, num_workers=config_dict['num_workers'])
 
-    # model = DnCNN(in_nc=3, out_nc=3, nc=64, nb=20, act_mode='BR')
-    model = DnCNN(channels = 3)
+    if config_dict['net'] == 'DnCNN':
+        from model.DnCNN import DnCNN
+        print('Training DnCNN')
+        model = DnCNN(channels = 3)
+    elif config_dict['net'] == 'UNet':
+        from model.UNet import UNet
+        print('Training UNet')
+        model = UNet(in_channels=3, out_channels=3)
+    
     criterion = create_loss_function(config_dict['loss'])
     optimizer = create_optimizer(model, config_dict['optimizer'], config_dict['learning_rate'])
     scheduler = create_scheduler(optimizer, config_dict['scheduler'], config_dict['step_size'], config_dict['gamma'])
