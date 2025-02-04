@@ -157,8 +157,8 @@ class Blurkernel(nn.Module):
 def corrupt(im: torch.Tensor, device: torch.device):
     with torch.no_grad():
         corruption = Blurkernel(blur_type = 'gaussian', 
-                                    kernel_size = 5, 
-                                    std = 5, 
+                                    kernel_size = 15, 
+                                    std = 15, 
                                     img_size = im.shape[0], 
                                     device = device)
         im = im.to(device)
