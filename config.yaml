@@ -22,9 +22,6 @@ hyperparameter:
 num_workers:
   num: 4
 
-noise_level:
-  start: 15
-  end: 15
 
 net:
   name: "UNet"

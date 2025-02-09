@@ -7,7 +7,7 @@ import os
 from train.optimizer import create_optimizer, create_scheduler, create_loss_function
 from data.blurring import corrupt
 import torchvision.transforms as transforms
-
+from data.utils import addnoise
 if __name__ == '__main__':
     config_path = os.path.join(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")), "config.yaml")
     config = yaml.safe_load(open("config.yaml"))
@@ -86,7 +86,7 @@ for epoch in range(num_epochs):
     for batch_idx, (inputs, labels) in enumerate(train_loader):
         inputs, labels = inputs.to(config_dict['device']), labels.to(config_dict['device'])
         inputs = corrupt(inputs, config_dict['device'])
-
+        inputs = addnoise(inputs, [25, 25], config_dict['device'])
         outputs = model(inputs)
         loss = criterion(outputs, labels) / (inputs.size()[0]*2)
 
@@ -107,7 +107,7 @@ for epoch in range(num_epochs):
         for batch_idx, (inputs, labels) in enumerate(test_loader):
             inputs, labels = inputs.to(config_dict['device']), labels.to(config_dict['device'])
             inputs = corrupt(inputs, config_dict['device'])
-
+            inputs = addnoise(inputs, [25, 25], config_dict['device'])
             outputs = model(inputs)
             loss = criterion(outputs, labels) / (inputs.size()[0]*2)
             val_loss += loss.item()
@@ -119,7 +119,12 @@ for epoch in range(num_epochs):
     # Save the model if validation loss is the best so far
     if avg_val_loss < best_val_loss:
         best_val_loss = avg_val_loss
-        torch.save(model.state_dict(), os.path.join(config_dict["output_path"], "deblurring.pth"))
+        if num_gpus > 1:
+
+            torch.save(model.module.state_dict(), os.path.join(config_dict["output_path"], "deblurring.pth"))
+        else:
+            torch.save(model.state_dict(), os.path.join(config_dict["output_path"], "deblurring.pth"))
+
         print(f"New best model saved with validation loss: {best_val_loss:.4f}")
 
     # Step the scheduler

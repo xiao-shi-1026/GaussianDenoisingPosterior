@@ -6,6 +6,7 @@ import yaml
 import os
 from train.optimizer import create_optimizer, create_scheduler, create_loss_function
 from data.blurring import corrupt
+import torchvision.transforms as transforms
 
 if __name__ == '__main__':
     config_path = os.path.join(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")), "config.yaml")
@@ -17,8 +18,8 @@ if __name__ == '__main__':
         'noise_level' : [config["noise_level"]['start'], config["noise_level"]['end']],
         'net': config["net"]["name"],
         # path
-        'train_path' : os.path.join(config["path"]["input"], "train.h5"),
-        'validate_path' : os.path.join(config["path"]["input"], "val.h5"),
+        'train_path' : os.path.join(config["path"]["input"], "train"),
+        'validate_path' : os.path.join(config["path"]["input"], "validation"),
         'output_path' : config["path"]["output"],
         # batch set
         'train_batch_size' : config["hyperparameter"]["train_batch"],
@@ -34,9 +35,19 @@ if __name__ == '__main__':
         'gamma' : config["scheduler"]["gamma"],
     }
 
-    train_dataset = ImageDataset(config_dict['train_path'])
+    data_augmentation = transforms.RandomChoice([
+        transforms.RandomVerticalFlip(p=1.0),
+        transforms.RandomRotation(90),
+        transforms.Compose([transforms.RandomRotation(90), transforms.RandomVerticalFlip(p=1.0)]),
+        transforms.RandomRotation(180),
+        transforms.Compose([transforms.RandomRotation(180), transforms.RandomVerticalFlip(p=1.0)]),
+        transforms.RandomRotation(270),
+        transforms.Compose([transforms.RandomRotation(270), transforms.RandomVerticalFlip(p=1.0)]),
+    ])
+
+    train_dataset = ImageDataset(config_dict['train_path'], data_augmentation)
     train_loader = DataLoader(dataset=train_dataset, batch_size=config_dict['train_batch_size'], shuffle=True, num_workers=config_dict['num_workers'])
-    test_dataset = ImageDataset(config_dict['validate_path'], False)
+    test_dataset = ImageDataset(config_dict['validate_path'], data_augmentation)
     test_loader = DataLoader(dataset=test_dataset, batch_size=config_dict['validate_batch_size'], shuffle=False, num_workers=config_dict['num_workers'])
 
     if config_dict['net'] == 'DnCNN':

@@ -6,10 +6,17 @@ from model.UNet import UNet
 from pathlib import Path
 import matplotlib.pyplot as plt
 from data.blurring import corrupt
-
+from collections import OrderedDict
+import torch.nn.functional as F
+from data.utils import addnoise
 def load_model(model_class, model_path, device):
     model = model_class()
-    model.load_state_dict(torch.load(model_path, map_location=device))
+    checkpoint = torch.load(model_path, map_location="cpu")
+    new_state_dict = OrderedDict()
+    for k, v in checkpoint.items():
+        new_key = k.replace("module.", "")
+        new_state_dict[new_key] = v
+    model.load_state_dict(new_state_dict)
     model.to(device)
     model.eval()
     return model
@@ -42,6 +49,8 @@ def inference_pipeline(model_path, image_path, device="cuda"):
 
     corrupted_tensor = corrupt(input_tensor, device)
 
+    corrupted_tensor = addnoise(corrupted_tensor, [25, 25],device)
+
     denoised_tensor = run_inference(model, corrupted_tensor, device)
 
     denoised_image = postprocess_output(denoised_tensor)
@@ -66,8 +75,39 @@ def plot_images(original_image, corrupted_tensor, denoised_image):
         ax.axis("off")
     plt.show()
 
+
+def real_inference(model_path, image_path, device="cuda"):
+    model = load_model(UNet, model_path, device)
+
+    input_tensor, original_image = preprocess_image(image_path)
+    
+    input_tensor = F.interpolate(input_tensor, size=(256, 256), mode="bilinear", align_corners=False)
+
+    input_tensor = input_tensor.to(device)
+
+    denoised_tensor = run_inference(model, input_tensor, device)
+
+    denoised_image = postprocess_output(denoised_tensor)
+
+    plot_real(original_image, denoised_image)
+
+def plot_real(original_image, denoised_image):
+
+    fig, axes = plt.subplots(1, 2, figsize=(15, 5))
+    axes[0].imshow(original_image)
+    axes[0].set_title("Original Image") 
+
+    axes[1].imshow(denoised_image)
+    axes[1].set_title("Denoised Image")
+
+    for ax in axes:
+        ax.axis("off")
+    plt.show()
+
+
 if __name__ == "__main__":
     model_path = r"C:\Users\sx119\Desktop\GaussianDenoisingPosterior\outputs\deblurring\deblurring.pth"
-    image_path = r"C:\Users\sx119\Desktop\GaussianDenoisingPosterior\data\test_image.png"
+    image_path = r"C:\Users\sx119\Desktop\GaussianDenoisingPosterior\data\test_image_toy.png"
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    inference_pipeline(model_path, image_path, device)
+    # real_inference(model_path, image_path, device)
+    inference_pipeline(model_path, r"C:\Users\sx119\Desktop\GaussianDenoisingPosterior\data\test_image_3.png", device)
