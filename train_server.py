@@ -7,6 +7,7 @@ from train.optimizer import create_optimizer, create_scheduler, create_loss_func
 from data.blurring import corrupt
 import torchvision.transforms as transforms
 from data.utils import addnoise
+from data.PSNR import evaluate_psnr_torch
 if __name__ == '__main__':
     config_path = os.path.join(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")), "config.yaml")
     config = yaml.safe_load(open("config.yaml"))
@@ -114,6 +115,11 @@ for epoch in range(num_epochs):
     avg_val_loss = val_loss / len(test_loader)
     print(f"Epoch {epoch + 1} Validation Completed. Average Loss: {avg_val_loss:.4f}")
     torch.cuda.empty_cache()
+
+    if epoch % 10 == 0:
+        # Calculate PSNR
+        avg_psnr = evaluate_psnr_torch(test_loader, config_dict['device'])
+        print(f"Average PSNR: {avg_psnr:.4f}")
 
     # Save the model if validation loss is the best so far
     if avg_val_loss < best_val_loss:
