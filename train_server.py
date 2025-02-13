@@ -1,7 +1,6 @@
 import torch
 from data.dataset import ImageDataset
 from torch.utils.data import DataLoader
-from tqdm import tqdm
 import yaml
 import os
 from train.optimizer import create_optimizer, create_scheduler, create_loss_function
