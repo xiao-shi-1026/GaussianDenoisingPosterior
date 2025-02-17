@@ -1,0 +1,420 @@
+Training UNet
+Using 2 GPUs for training...
+Starting epoch 1/100
+Current Learning Rate: 0.001000
+Epoch 1 Training Completed. Average Loss: 968.6128
+Epoch 1 Validation Completed. Average Loss: 349.5518
+Average PSNR: 22.0374
+New best model saved with validation loss: 349.5518
+Starting epoch 2/100
+Current Learning Rate: 0.001000
+Epoch 2 Training Completed. Average Loss: 334.2817
+Epoch 2 Validation Completed. Average Loss: 320.2762
+New best model saved with validation loss: 320.2762
+Starting epoch 3/100
+Current Learning Rate: 0.001000
+Epoch 3 Training Completed. Average Loss: 312.8233
+Epoch 3 Validation Completed. Average Loss: 304.1298
+New best model saved with validation loss: 304.1298
+Starting epoch 4/100
+Current Learning Rate: 0.001000
+Epoch 4 Training Completed. Average Loss: 300.1251
+Epoch 4 Validation Completed. Average Loss: 296.6435
+New best model saved with validation loss: 296.6435
+Starting epoch 5/100
+Current Learning Rate: 0.001000
+Epoch 5 Training Completed. Average Loss: 292.2552
+Epoch 5 Validation Completed. Average Loss: 297.4401
+Starting epoch 6/100
+Current Learning Rate: 0.001000
+Epoch 6 Training Completed. Average Loss: 286.1646
+Epoch 6 Validation Completed. Average Loss: 281.7190
+New best model saved with validation loss: 281.7190
+Starting epoch 7/100
+Current Learning Rate: 0.001000
+Epoch 7 Training Completed. Average Loss: 282.3191
+Epoch 7 Validation Completed. Average Loss: 279.3392
+New best model saved with validation loss: 279.3392
+Starting epoch 8/100
+Current Learning Rate: 0.001000
+Epoch 8 Training Completed. Average Loss: 277.7064
+Epoch 8 Validation Completed. Average Loss: 273.9863
+New best model saved with validation loss: 273.9863
+Starting epoch 9/100
+Current Learning Rate: 0.001000
+Epoch 9 Training Completed. Average Loss: 275.0751
+Epoch 9 Validation Completed. Average Loss: 272.3426
+New best model saved with validation loss: 272.3426
+Starting epoch 10/100
+Current Learning Rate: 0.001000
+Epoch 10 Training Completed. Average Loss: 272.3862
+Epoch 10 Validation Completed. Average Loss: 269.6222
+New best model saved with validation loss: 269.6222
+Starting epoch 11/100
+Current Learning Rate: 0.000500
+Epoch 11 Training Completed. Average Loss: 265.1889
+Epoch 11 Validation Completed. Average Loss: 264.6645
+Average PSNR: 22.0172
+New best model saved with validation loss: 264.6645
+Starting epoch 12/100
+Current Learning Rate: 0.000500
+Epoch 12 Training Completed. Average Loss: 264.6112
+Epoch 12 Validation Completed. Average Loss: 265.3931
+Starting epoch 13/100
+Current Learning Rate: 0.000500
+Epoch 13 Training Completed. Average Loss: 263.7396
+Epoch 13 Validation Completed. Average Loss: 264.0301
+New best model saved with validation loss: 264.0301
+Starting epoch 14/100
+Current Learning Rate: 0.000500
+Epoch 14 Training Completed. Average Loss: 262.7179
+Epoch 14 Validation Completed. Average Loss: 261.8217
+New best model saved with validation loss: 261.8217
+Starting epoch 15/100
+Current Learning Rate: 0.000500
+Epoch 15 Training Completed. Average Loss: 261.8441
+Epoch 15 Validation Completed. Average Loss: 260.6484
+New best model saved with validation loss: 260.6484
+Starting epoch 16/100
+Current Learning Rate: 0.000500
+Epoch 16 Training Completed. Average Loss: 260.8203
+Epoch 16 Validation Completed. Average Loss: 260.5754
+New best model saved with validation loss: 260.5754
+Starting epoch 17/100
+Current Learning Rate: 0.000500
+Epoch 17 Training Completed. Average Loss: 259.9962
+Epoch 17 Validation Completed. Average Loss: 258.7052
+New best model saved with validation loss: 258.7052
+Starting epoch 18/100
+Current Learning Rate: 0.000500
+Epoch 18 Training Completed. Average Loss: 259.2968
+Epoch 18 Validation Completed. Average Loss: 259.0510
+Starting epoch 19/100
+Current Learning Rate: 0.000500
+Epoch 19 Training Completed. Average Loss: 258.4890
+Epoch 19 Validation Completed. Average Loss: 257.9154
+New best model saved with validation loss: 257.9154
+Starting epoch 20/100
+Current Learning Rate: 0.000500
+Epoch 20 Training Completed. Average Loss: 257.8204
+Epoch 20 Validation Completed. Average Loss: 256.6326
+New best model saved with validation loss: 256.6326
+Starting epoch 21/100
+Current Learning Rate: 0.000250
+Epoch 21 Training Completed. Average Loss: 254.4223
+Epoch 21 Validation Completed. Average Loss: 254.4569
+Average PSNR: 22.0375
+New best model saved with validation loss: 254.4569
+Starting epoch 22/100
+Current Learning Rate: 0.000250
+Epoch 22 Training Completed. Average Loss: 254.2417
+Epoch 22 Validation Completed. Average Loss: 253.9837
+New best model saved with validation loss: 253.9837
+Starting epoch 23/100
+Current Learning Rate: 0.000250
+Epoch 23 Training Completed. Average Loss: 253.6517
+Epoch 23 Validation Completed. Average Loss: 254.9296
+Starting epoch 24/100
+Current Learning Rate: 0.000250
+Epoch 24 Training Completed. Average Loss: 253.4667
+Epoch 24 Validation Completed. Average Loss: 253.2440
+New best model saved with validation loss: 253.2440
+Starting epoch 25/100
+Current Learning Rate: 0.000250
+Epoch 25 Training Completed. Average Loss: 253.0138
+Epoch 25 Validation Completed. Average Loss: 252.5531
+New best model saved with validation loss: 252.5531
+Starting epoch 26/100
+Current Learning Rate: 0.000250
+Epoch 26 Training Completed. Average Loss: 252.8068
+Epoch 26 Validation Completed. Average Loss: 253.0551
+Starting epoch 27/100
+Current Learning Rate: 0.000250
+Epoch 27 Training Completed. Average Loss: 252.3700
+Epoch 27 Validation Completed. Average Loss: 252.5407
+New best model saved with validation loss: 252.5407
+Starting epoch 28/100
+Current Learning Rate: 0.000250
+Epoch 28 Training Completed. Average Loss: 252.1207
+Epoch 28 Validation Completed. Average Loss: 251.5033
+New best model saved with validation loss: 251.5033
+Starting epoch 29/100
+Current Learning Rate: 0.000250
+Epoch 29 Training Completed. Average Loss: 251.9347
+Epoch 29 Validation Completed. Average Loss: 251.6923
+Starting epoch 30/100
+Current Learning Rate: 0.000250
+Epoch 30 Training Completed. Average Loss: 251.6378
+Epoch 30 Validation Completed. Average Loss: 250.9220
+New best model saved with validation loss: 250.9220
+Starting epoch 31/100
+Current Learning Rate: 0.000125
+Epoch 31 Training Completed. Average Loss: 250.0281
+Epoch 31 Validation Completed. Average Loss: 249.8938
+Average PSNR: 22.0365
+New best model saved with validation loss: 249.8938
+Starting epoch 32/100
+Current Learning Rate: 0.000125
+Epoch 32 Training Completed. Average Loss: 249.8449
+Epoch 32 Validation Completed. Average Loss: 249.7761
+New best model saved with validation loss: 249.7761
+Starting epoch 33/100
+Current Learning Rate: 0.000125
+Epoch 33 Training Completed. Average Loss: 249.7502
+Epoch 33 Validation Completed. Average Loss: 249.7095
+New best model saved with validation loss: 249.7095
+Starting epoch 34/100
+Current Learning Rate: 0.000125
+Epoch 34 Training Completed. Average Loss: 249.5309
+Epoch 34 Validation Completed. Average Loss: 248.9752
+New best model saved with validation loss: 248.9752
+Starting epoch 35/100
+Current Learning Rate: 0.000125
+Epoch 35 Training Completed. Average Loss: 249.3485
+Epoch 35 Validation Completed. Average Loss: 249.0383
+Starting epoch 36/100
+Current Learning Rate: 0.000125
+Epoch 36 Training Completed. Average Loss: 249.1015
+Epoch 36 Validation Completed. Average Loss: 249.0177
+Starting epoch 37/100
+Current Learning Rate: 0.000125
+Epoch 37 Training Completed. Average Loss: 248.9591
+Epoch 37 Validation Completed. Average Loss: 248.5021
+New best model saved with validation loss: 248.5021
+Starting epoch 38/100
+Current Learning Rate: 0.000125
+Epoch 38 Training Completed. Average Loss: 248.8066
+Epoch 38 Validation Completed. Average Loss: 249.1318
+Starting epoch 39/100
+Current Learning Rate: 0.000125
+Epoch 39 Training Completed. Average Loss: 248.6943
+Epoch 39 Validation Completed. Average Loss: 248.5053
+Starting epoch 40/100
+Current Learning Rate: 0.000125
+Epoch 40 Training Completed. Average Loss: 248.6058
+Epoch 40 Validation Completed. Average Loss: 248.1352
+New best model saved with validation loss: 248.1352
+Starting epoch 41/100
+Current Learning Rate: 0.000063
+Epoch 41 Training Completed. Average Loss: 247.8568
+Epoch 41 Validation Completed. Average Loss: 247.5394
+Average PSNR: 22.0315
+New best model saved with validation loss: 247.5394
+Starting epoch 42/100
+Current Learning Rate: 0.000063
+Epoch 42 Training Completed. Average Loss: 247.7425
+Epoch 42 Validation Completed. Average Loss: 247.6335
+Starting epoch 43/100
+Current Learning Rate: 0.000063
+Epoch 43 Training Completed. Average Loss: 247.5717
+Epoch 43 Validation Completed. Average Loss: 247.3835
+New best model saved with validation loss: 247.3835
+Starting epoch 44/100
+Current Learning Rate: 0.000063
+Epoch 44 Training Completed. Average Loss: 247.6109
+Epoch 44 Validation Completed. Average Loss: 247.0773
+New best model saved with validation loss: 247.0773
+Starting epoch 45/100
+Current Learning Rate: 0.000063
+Epoch 45 Training Completed. Average Loss: 247.4322
+Epoch 45 Validation Completed. Average Loss: 247.1721
+Starting epoch 46/100
+Current Learning Rate: 0.000063
+Epoch 46 Training Completed. Average Loss: 247.2797
+Epoch 46 Validation Completed. Average Loss: 247.2536
+Starting epoch 47/100
+Current Learning Rate: 0.000063
+Epoch 47 Training Completed. Average Loss: 247.1593
+Epoch 47 Validation Completed. Average Loss: 246.7946
+New best model saved with validation loss: 246.7946
+Starting epoch 48/100
+Current Learning Rate: 0.000063
+Epoch 48 Training Completed. Average Loss: 247.1060
+Epoch 48 Validation Completed. Average Loss: 247.2013
+Starting epoch 49/100
+Current Learning Rate: 0.000063
+Epoch 49 Training Completed. Average Loss: 247.1611
+Epoch 49 Validation Completed. Average Loss: 246.8088
+Starting epoch 50/100
+Current Learning Rate: 0.000063
+Epoch 50 Training Completed. Average Loss: 247.0970
+Epoch 50 Validation Completed. Average Loss: 246.6120
+New best model saved with validation loss: 246.6120
+Starting epoch 51/100
+Current Learning Rate: 0.000031
+Epoch 51 Training Completed. Average Loss: 246.7068
+Epoch 51 Validation Completed. Average Loss: 246.3057
+Average PSNR: 22.0156
+New best model saved with validation loss: 246.3057
+Starting epoch 52/100
+Current Learning Rate: 0.000031
+Epoch 52 Training Completed. Average Loss: 246.5990
+Epoch 52 Validation Completed. Average Loss: 246.3915
+Starting epoch 53/100
+Current Learning Rate: 0.000031
+Epoch 53 Training Completed. Average Loss: 246.4088
+Epoch 53 Validation Completed. Average Loss: 246.6356
+Starting epoch 54/100
+Current Learning Rate: 0.000031
+Epoch 54 Training Completed. Average Loss: 246.5880
+Epoch 54 Validation Completed. Average Loss: 246.2102
+New best model saved with validation loss: 246.2102
+Starting epoch 55/100
+Current Learning Rate: 0.000031
+Epoch 55 Training Completed. Average Loss: 246.4778
+Epoch 55 Validation Completed. Average Loss: 245.9240
+New best model saved with validation loss: 245.9240
+Starting epoch 56/100
+Current Learning Rate: 0.000031
+Epoch 56 Training Completed. Average Loss: 246.3649
+Epoch 56 Validation Completed. Average Loss: 246.3931
+Starting epoch 57/100
+Current Learning Rate: 0.000031
+Epoch 57 Training Completed. Average Loss: 246.3701
+Epoch 57 Validation Completed. Average Loss: 246.2146
+Starting epoch 58/100
+Current Learning Rate: 0.000031
+Epoch 58 Training Completed. Average Loss: 246.4262
+Epoch 58 Validation Completed. Average Loss: 246.1724
+Starting epoch 59/100
+Current Learning Rate: 0.000031
+Epoch 59 Training Completed. Average Loss: 246.4300
+Epoch 59 Validation Completed. Average Loss: 246.1979
+Starting epoch 60/100
+Current Learning Rate: 0.000031
+Epoch 60 Training Completed. Average Loss: 246.2972
+Epoch 60 Validation Completed. Average Loss: 246.2863
+Starting epoch 61/100
+Current Learning Rate: 0.000016
+Epoch 61 Training Completed. Average Loss: 245.9821
+Epoch 61 Validation Completed. Average Loss: 245.7146
+Average PSNR: 22.0275
+New best model saved with validation loss: 245.7146
+Starting epoch 62/100
+Current Learning Rate: 0.000016
+Epoch 62 Training Completed. Average Loss: 246.0576
+Epoch 62 Validation Completed. Average Loss: 245.6530
+New best model saved with validation loss: 245.6530
+Starting epoch 63/100
+Current Learning Rate: 0.000016
+Epoch 63 Training Completed. Average Loss: 245.9997
+Epoch 63 Validation Completed. Average Loss: 245.6190
+New best model saved with validation loss: 245.6190
+Starting epoch 64/100
+Current Learning Rate: 0.000016
+Epoch 64 Training Completed. Average Loss: 246.0130
+Epoch 64 Validation Completed. Average Loss: 245.8767
+Starting epoch 65/100
+Current Learning Rate: 0.000016
+Epoch 65 Training Completed. Average Loss: 245.8618
+Epoch 65 Validation Completed. Average Loss: 245.4763
+New best model saved with validation loss: 245.4763
+Starting epoch 66/100
+Current Learning Rate: 0.000016
+Epoch 66 Training Completed. Average Loss: 245.9708
+Epoch 66 Validation Completed. Average Loss: 245.8206
+Starting epoch 67/100
+Current Learning Rate: 0.000016
+Epoch 67 Training Completed. Average Loss: 245.9039
+Epoch 67 Validation Completed. Average Loss: 245.5592
+Starting epoch 68/100
+Current Learning Rate: 0.000016
+Epoch 68 Training Completed. Average Loss: 245.8536
+Epoch 68 Validation Completed. Average Loss: 245.3971
+New best model saved with validation loss: 245.3971
+Starting epoch 69/100
+Current Learning Rate: 0.000016
+Epoch 69 Training Completed. Average Loss: 245.8929
+Epoch 69 Validation Completed. Average Loss: 245.8115
+Starting epoch 70/100
+Current Learning Rate: 0.000016
+Epoch 70 Training Completed. Average Loss: 245.8902
+Epoch 70 Validation Completed. Average Loss: 245.6641
+Starting epoch 71/100
+Current Learning Rate: 0.000008
+Epoch 71 Training Completed. Average Loss: 245.7666
+Epoch 71 Validation Completed. Average Loss: 245.4046
+Average PSNR: 22.0292
+Starting epoch 72/100
+Current Learning Rate: 0.000008
+Epoch 72 Training Completed. Average Loss: 245.7211
+Epoch 72 Validation Completed. Average Loss: 245.4153
+Starting epoch 73/100
+Current Learning Rate: 0.000008
+Epoch 73 Training Completed. Average Loss: 245.6074
+Epoch 73 Validation Completed. Average Loss: 245.5458
+Starting epoch 74/100
+Current Learning Rate: 0.000008
+Epoch 74 Training Completed. Average Loss: 245.5763
+Epoch 74 Validation Completed. Average Loss: 245.7843
+Starting epoch 75/100
+Current Learning Rate: 0.000008
+Epoch 75 Training Completed. Average Loss: 245.6815
+Epoch 75 Validation Completed. Average Loss: 245.1623
+New best model saved with validation loss: 245.1623
+Starting epoch 76/100
+Current Learning Rate: 0.000008
+Epoch 76 Training Completed. Average Loss: 245.8462
+Epoch 76 Validation Completed. Average Loss: 245.3356
+Starting epoch 77/100
+Current Learning Rate: 0.000008
+Epoch 77 Training Completed. Average Loss: 245.6511
+Epoch 77 Validation Completed. Average Loss: 245.2358
+Starting epoch 78/100
+Current Learning Rate: 0.000008
+Epoch 78 Training Completed. Average Loss: 245.5524
+Epoch 78 Validation Completed. Average Loss: 245.6225
+Starting epoch 79/100
+Current Learning Rate: 0.000008
+Epoch 79 Training Completed. Average Loss: 245.6170
+Epoch 79 Validation Completed. Average Loss: 245.3291
+Starting epoch 80/100
+Current Learning Rate: 0.000008
+Epoch 80 Training Completed. Average Loss: 245.6709
+Epoch 80 Validation Completed. Average Loss: 245.6678
+Starting epoch 81/100
+Current Learning Rate: 0.000004
+Epoch 81 Training Completed. Average Loss: 245.5956
+Epoch 81 Validation Completed. Average Loss: 245.4621
+Average PSNR: 22.0305
+Starting epoch 82/100
+Current Learning Rate: 0.000004
+Epoch 82 Training Completed. Average Loss: 245.4847
+Epoch 82 Validation Completed. Average Loss: 245.2836
+Starting epoch 83/100
+Current Learning Rate: 0.000004
+Epoch 83 Training Completed. Average Loss: 245.4462
+Epoch 83 Validation Completed. Average Loss: 245.2211
+Starting epoch 84/100
+Current Learning Rate: 0.000004
+Epoch 84 Training Completed. Average Loss: 245.5668
+Epoch 84 Validation Completed. Average Loss: 245.2810
+Starting epoch 85/100
+Current Learning Rate: 0.000004
+Epoch 85 Training Completed. Average Loss: 245.5476
+Epoch 85 Validation Completed. Average Loss: 245.3130
+Starting epoch 86/100
+Current Learning Rate: 0.000004
+Epoch 86 Training Completed. Average Loss: 245.5594
+Epoch 86 Validation Completed. Average Loss: 245.2954
+Starting epoch 87/100
+Current Learning Rate: 0.000004
+Epoch 87 Training Completed. Average Loss: 245.4725
+Epoch 87 Validation Completed. Average Loss: 245.1238
+New best model saved with validation loss: 245.1238
+Starting epoch 88/100
+Current Learning Rate: 0.000004
+Epoch 88 Training Completed. Average Loss: 245.5296
+Epoch 88 Validation Completed. Average Loss: 245.2949
+Starting epoch 89/100
+Current Learning Rate: 0.000004
+Epoch 89 Training Completed. Average Loss: 245.6377
+Epoch 89 Validation Completed. Average Loss: 245.5436
+Starting epoch 90/100
+Current Learning Rate: 0.000004
+Epoch 90 Training Completed. Average Loss: 245.5685
+Epoch 90 Validation Completed. Average Loss: 245.3122
+Starting epoch 91/100
+Current Learning Rate: 0.000002
+
+Final Average PSNR: 22.0308
