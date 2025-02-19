@@ -8,6 +8,8 @@ from data.blurring import corrupt
 import torchvision.transforms as transforms
 from data.utils import addnoise
 from data.PSNR import evaluate_psnr_torch
+import numpy as np
+import random
 if __name__ == '__main__':
     config_path = os.path.join(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")), "config.yaml")
     config = yaml.safe_load(open("config.yaml"))
@@ -32,7 +34,18 @@ if __name__ == '__main__':
         'scheduler' : config["scheduler"]["name"],
         'step_size' : config["scheduler"]["step_size"],
         'gamma' : config["scheduler"]["gamma"],
+        # random seed
+        'seed' : config["seed"]["number"]
     }
+    seed = config_dict["seed"]
+
+    if seed is None:
+        seed = random.randint(1, 10000)
+    print('Random seed: {}'.format(seed))
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
 
     data_augmentation = transforms.RandomChoice([
         transforms.RandomVerticalFlip(p=1.0),
@@ -86,7 +99,7 @@ for epoch in range(num_epochs):
     for batch_idx, (inputs, labels) in enumerate(train_loader):
         inputs, labels = inputs.to(config_dict['device']), labels.to(config_dict['device'])
         inputs = corrupt(inputs, config_dict['device'])
-        inputs = addnoise(inputs, [25, 25], config_dict['device'])
+        inputs = addnoise(inputs, [15, 15], config_dict['device'])
         outputs = model(inputs)
         loss = criterion(outputs, labels) / (inputs.size()[0]*2)
 
@@ -107,7 +120,7 @@ for epoch in range(num_epochs):
         for batch_idx, (inputs, labels) in enumerate(test_loader):
             inputs, labels = inputs.to(config_dict['device']), labels.to(config_dict['device'])
             inputs = corrupt(inputs, config_dict['device'])
-            inputs = addnoise(inputs, [25, 25], config_dict['device'])
+            inputs = addnoise(inputs, [15, 15], config_dict['device'])
             outputs = model(inputs)
             loss = criterion(outputs, labels) / (inputs.size()[0]*2)
             val_loss += loss.item()
@@ -116,7 +129,7 @@ for epoch in range(num_epochs):
     print(f"Epoch {epoch + 1} Validation Completed. Average Loss: {avg_val_loss:.4f}")
     torch.cuda.empty_cache()
 
-    if epoch % 10 == 0:
+    if (epoch + 1) % 5 == 0:
         # Calculate PSNR
         avg_psnr = evaluate_psnr_torch(test_loader, config_dict['device'])
         print(f"Average PSNR: {avg_psnr:.4f}")

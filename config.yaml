@@ -4,7 +4,7 @@ optimizer:
 
 scheduler:
   name: step_lr
-  step_size: 5
+  step_size: 10
   gamma: 0.5
 
 loss:
@@ -25,3 +25,6 @@ num_workers:
 
 net:
   name: "UNet"
+
+seed:
+  number: 42
