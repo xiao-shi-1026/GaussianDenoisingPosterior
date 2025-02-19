@@ -117,7 +117,7 @@ def px_pdf_real(xs: np.array, means: list, sigmas: list, weights: np.array = Non
     M = len(means)  # Number of Gaussian components
     pdf = np.zeros((M, xs.shape[1]))  # Store pdfs
     for i in range(M):
-        pdf[i] = 1 / (2* np.pi * np.linalg.det(sigmas[i])) * np.diag(np.exp(-0.5 * (xs - means[i].reshape(-1, 1)).T @ np.linalg.inv((sigmas[i])) @ (xs - means[i].reshape(-1, 1))))
+        pdf[i] = 1 / (2 * np.pi * np.linalg.det(sigmas[i])) * np.diag(np.exp(-0.5 * (xs - means[i].reshape(-1, 1)).T @ np.linalg.inv((sigmas[i])) @ (xs - means[i].reshape(-1, 1))))
 
     if weights is None:
         weights = np.ones(M, dtype=np.float64) / M
