@@ -84,9 +84,9 @@ def mu1_real(y: np.array, A: np.array, means: list, sigmas: list, Nsigma: np.arr
     """
     y = y.astype(np.float64)
     M = len(means)  # Number of Gaussian components
-    d, N = y.shape
-
-    mu = np.zeros((M, d, N))  # Store posterior means
+    dy, N = y.shape
+    dx = A.shape[1]
+    mu = np.zeros((M, dx, N))  # Store posterior means
     p = np.zeros((M, N))  # Store likelihoods
 
     for i in range(M):
@@ -161,16 +161,20 @@ def moment_calculation(y: np.array, A: np.array, means: list, sigmas: list, Nsig
         eigvals: np.array(n_ev,)         - Eigenvalues of the posterior distribution
         mmse: np.array(d, N)             - Minimum mean square error estimate of x
     """
-    d, N = y.shape  # Extract dimensions
+    dy, N = y.shape  # Extract dimensions
+    dx = A.shape[1]
     A_invT = np.linalg.pinv(A.T)
+    print(A_invT.shape)
     mmse = mu1_real(y, A, means, sigmas, Nsigma)
-    eigvecs = np.random.randn(d, n_ev) * np.sqrt(np.mean(np.diag(Nsigma)))
-    Ab = np.zeros((d, n_ev))
+    eigvecs = np.random.randn(dx, n_ev) * np.sqrt(np.mean(np.diag(Nsigma)))
+    Ab = np.zeros((dx, n_ev))
+
     for i in range(iters):
         for j in range(n_ev - 1):
-            out = mu1_real(y + eigvecs[:,j].reshape(-1, 1), A, means, sigmas, Nsigma)
 
-            Ab[:,j] = (out - mmse).T @ A_invT
+            out = mu1_real(y + A @ eigvecs[:,j].reshape(-1, 1), A, means, sigmas, Nsigma)
+
+            Ab[:,j] = (out - mmse).T
 
         if n_ev > 1:
             norm_of_Ab = np.linalg.norm(Ab, axis=0)
