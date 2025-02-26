@@ -1,5 +1,5 @@
 import numpy as np
-
+from scipy.stats import multivariate_normal
 def generate_mu_list(M: int, D: int) -> list:
     """
     Generate a list of M mean vectors for a D-dimensional Gaussian Mixture Model (GMM).
@@ -103,7 +103,8 @@ def mu1_real(y: np.array, A: np.array, means: list, sigmas: list, Nsigma: np.arr
 def px_pdf_real(xs: np.array, means: list, sigmas: list, weights: np.array = None) -> np.array:
     """
     Calculate the pdf of an M-component Gaussian Mixture Model (GMM).
-    
+    xs should have the same dimensionality as the means and sigmas.
+
     Parameters:
         xs: np.array(d, N)         - Data points (d-dimensional, N samples)
         means: list of np.array(d, 1)  - List of mean vectors of M Gaussian components
@@ -115,13 +116,21 @@ def px_pdf_real(xs: np.array, means: list, sigmas: list, weights: np.array = Non
     """
     xs = xs.astype(np.float64)
     M = len(means)  # Number of Gaussian components
-    pdf = np.zeros((M, xs.shape[1]))  # Store pdfs
-    for i in range(M):
-        pdf[i] = 1 / (2 * np.pi * np.linalg.det(sigmas[i])) * np.diag(np.exp(-0.5 * (xs - means[i].reshape(-1, 1)).T @ np.linalg.inv((sigmas[i])) @ (xs - means[i].reshape(-1, 1))))
 
-    if weights is None:
+    pdf = np.zeros((M, xs.shape[1]))  # Store pdfs
+
+    for i in range(M):
+        pdf[i] = multivariate_normal.pdf(xs.T, mean=means[i].flatten(), cov=sigmas[i])
+
+    if weights is None: # default weights
         weights = np.ones(M, dtype=np.float64) / M
-    return np.sum(pdf * weights[:, None], axis=0)
+
+    total_pdf = np.sum(pdf * weights[:, None], axis=0)
+
+    # Calculate the mean of the pdf
+    mu_gmm = np.sum(np.array(means) * weights[:, None], axis=0)
+
+    return total_pdf, mu_gmm
 
 def generate_noise(level: float, D: int, N: int) -> tuple:
     """
@@ -142,7 +151,7 @@ def generate_noise(level: float, D: int, N: int) -> tuple:
 
 def moment_calculation(y: np.array, A: np.array, means: list, sigmas: list, Nsigma: np.array, n_ev, iters = 500, c = 1e-5):
     """
-    Calculate the first and second moments of the posterior distribution of a GMM using the power method.
+    Calculate the projected first and second moments of the posterior distribution of a GMM using the power method.
     
     Params:
         y: np.array(d, N)          - Observations (d-dimensional, N samples)
@@ -161,16 +170,16 @@ def moment_calculation(y: np.array, A: np.array, means: list, sigmas: list, Nsig
         eigvals: np.array(n_ev,)         - Eigenvalues of the posterior distribution
         mmse: np.array(d, N)             - Minimum mean square error estimate of x
     """
-    dy, N = y.shape  # Extract dimensions
+
     dx = A.shape[1]
-    A_invT = np.linalg.pinv(A.T)
-    print(A_invT.shape)
+    # A_invT = np.linalg.pinv(A.T)
+    # print(A_invT.shape)
     mmse = mu1_real(y, A, means, sigmas, Nsigma)
     eigvecs = np.random.randn(dx, n_ev) * np.sqrt(np.mean(np.diag(Nsigma)))
     Ab = np.zeros((dx, n_ev))
 
     for i in range(iters):
-        for j in range(n_ev - 1):
+        for j in range(n_ev):
 
             out = mu1_real(y + A @ eigvecs[:,j].reshape(-1, 1), A, means, sigmas, Nsigma)
 
