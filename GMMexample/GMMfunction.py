@@ -1,5 +1,6 @@
 import numpy as np
 from scipy.stats import multivariate_normal
+
 def generate_mu_list(M: int, D: int) -> list:
     """
     Generate a list of M mean vectors for a D-dimensional Gaussian Mixture Model (GMM).
@@ -11,7 +12,7 @@ def generate_mu_list(M: int, D: int) -> list:
     Returns:
         list of np.array: List of mean vectors for each Gaussian component.
     """
-    return [np.random.uniform(-10, 10, size=(D,)) for _ in range(M)]
+    return [np.random.uniform(0, 10, size=(D,)) for _ in range(M)]
 
 def generate_sigma_list(M: int, D: int) -> list:
     """
@@ -25,7 +26,7 @@ def generate_sigma_list(M: int, D: int) -> list:
         list of np.array: List of covariance matrices for each Gaussian component.
     """
 
-    A = np.random.randn(D, D)
+    A = A = np.random.uniform(0, 2, (D, D))
     return [A @ A.T + np.eye(D) for _ in range(M)]
 
 
@@ -149,7 +150,7 @@ def generate_noise(level: float, D: int, N: int) -> tuple:
     noise = np.random.multivariate_normal(np.array([0 for i in range(D)]), Nsigma, (N,)).astype(np.float64).T
     return Nsigma, noise
 
-def moment_calculation(y: np.array, A: np.array, means: list, sigmas: list, Nsigma: np.array, n_ev, iters = 500, c = 1e-5):
+def moment_calculation(y: np.array, A: np.array, means: list, sigmas: list, Nsigma: np.array, n_ev, iters = 100, c = 1e-5):
     """
     Calculate the projected first and second moments of the posterior distribution of a GMM using the power method.
     
@@ -198,7 +199,7 @@ def moment_calculation(y: np.array, A: np.array, means: list, sigmas: list, Nsig
         eigvecs *= c
 
     eigvals = (norm_of_Ab / c * np.mean(np.diag(Nsigma))).reshape(n_ev, )
-
+    eigvecs /= c
 
     # QR decomposition does not gaurantee that eigenvectors are sorted.
     sort_idx = np.argsort(eigvals)[::-1]
@@ -206,6 +207,59 @@ def moment_calculation(y: np.array, A: np.array, means: list, sigmas: list, Nsig
     eigvecs = eigvecs[:, sort_idx]
 
     first_moments = eigvecs.T @ mmse
-    second_moments = eigvals
+
+    second_moments = np.abs(eigvals)
 
     return first_moments, second_moments, eigvecs, eigvals, mmse
+
+def x_given_y_v(alpha, Yt, means, sigmas, sigmaN, v, weights = None):
+    """
+    计算 M 组件 GMM 在给定观测 Yt 后，在方向 v 上的投影概率密度。
+
+    参数:
+        alpha: np.array (N,) - 需要计算的投影点 (1D)
+        Yt: np.array (d, N) - 观测数据 (d维, N个样本)
+        means: list[np.array(d,)] - GMM 每个分量的均值 (M 个 d 维向量)
+        sigmas: list[np.array(d, d)] - GMM 每个分量的协方差 (M 个 d×d 矩阵)
+        sigmaN: np.array (d, d) - 观测噪声协方差矩阵
+        v: np.array (d,) - 方向向量 (d 维)
+        weights: np.array (M,) - GMM 每个分量的混合权重 (M 个值，且 sum(weights) = 1)
+
+    返回:
+        out: np.array (N,) - 在方向 v 上的投影概率密度
+    """
+    Y = Yt.T  # 转置以适配 NumPy 计算
+    M = len(means)  # GMM 组件数
+    d = Y.shape[1]  # 维度
+    N = alpha.shape[0]  # 需要计算的投影点个数
+    if weights is None:
+        weights = np.ones(len(means)) / len(means)  # 设为均匀分布
+
+    # 计算 p(Y | C_i) (先验观测概率)
+    p_y_given_C = np.zeros((M, Y.shape[0]))
+    for i in range(M):
+        cov_i = sigmas[i] + sigmaN
+        p_y_given_C[i] = multivariate_normal.pdf(Y, mean=means[i], cov=cov_i)
+
+    # 计算 p(C_i | Y) (后验概率)
+    weighted_p_y_given_C = p_y_given_C * weights[:, None]  # 乘以 GMM 先验权重
+    p_C_given_Y = weighted_p_y_given_C / np.sum(weighted_p_y_given_C, axis=0, keepdims=True)
+
+    # 计算投影后的 1D 高斯参数 (均值 & 方差)
+    mu_x_given_y = np.zeros((M, Y.shape[0]))  # 存储投影均值
+    sigma_x_given_y = np.zeros(M)  # 存储投影方差
+
+    for i in range(M):
+        inv_cov_i = np.linalg.inv(sigmas[i] + sigmaN)
+        mu_x_given_y[i] = np.dot(v, means[i].reshape(-1, 1) + sigmas[i] @ inv_cov_i @ (Y.T - means[i].reshape(-1, 1)))
+        sigma_x_given_y[i] = np.dot(v, (sigmas[i] - sigmas[i] @ inv_cov_i @ sigmas[i]) @ v)
+
+    # 计算投影后的 1D GMM 概率密度
+    p_x_given_y = np.zeros((M, Y.shape[0], N))
+    for i in range(M):
+        p_x_given_y[i] = multivariate_normal.pdf(alpha[:, None], mean=mu_x_given_y[i], cov=sigma_x_given_y[i])
+
+    # 计算最终的加权后验概率密度
+    out = np.sum(p_x_given_y * p_C_given_Y[:, :, None], axis=0)  # (N,)
+
+    return out
