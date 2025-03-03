@@ -212,47 +212,50 @@ def moment_calculation(y: np.array, A: np.array, means: list, sigmas: list, Nsig
 
     return first_moments, second_moments, eigvecs, eigvals, mmse
 
-def x_given_y_v(alpha, Yt, means, sigmas, sigmaN, v, weights = None):
+def x_given_y_v(alpha, Yt, means, sigmas, A, sigmaN, v, weights=None):
     """
-    计算 M 组件 GMM 在给定观测 Yt 后，在方向 v 上的投影概率密度。
+    计算 M 组件 GMM 在给定观测 Yt 后，在方向 v 上的投影概率密度 (支持 y = Ax + n)。
 
     参数:
         alpha: np.array (N,) - 需要计算的投影点 (1D)
-        Yt: np.array (d, N) - 观测数据 (d维, N个样本)
+        Yt: np.array (d', N) - 观测数据 (d' 维, N 个样本)
         means: list[np.array(d,)] - GMM 每个分量的均值 (M 个 d 维向量)
         sigmas: list[np.array(d, d)] - GMM 每个分量的协方差 (M 个 d×d 矩阵)
-        sigmaN: np.array (d, d) - 观测噪声协方差矩阵
+        A: np.array (d', d) - 线性变换矩阵 A (d' × d)
+        sigmaN: np.array (d', d') - 观测噪声协方差矩阵 (d' × d')
         v: np.array (d,) - 方向向量 (d 维)
         weights: np.array (M,) - GMM 每个分量的混合权重 (M 个值，且 sum(weights) = 1)
 
     返回:
         out: np.array (N,) - 在方向 v 上的投影概率密度
     """
-    Y = Yt.T  # 转置以适配 NumPy 计算
+    Y = Yt.T  # (d', N) 转置为 (N, d')
     M = len(means)  # GMM 组件数
-    d = Y.shape[1]  # 维度
+    d = A.shape[1]  # X 维度 (d)
+    d_prime = A.shape[0]  # Y 维度 (d')
     N = alpha.shape[0]  # 需要计算的投影点个数
+
     if weights is None:
-        weights = np.ones(len(means)) / len(means)  # 设为均匀分布
+        weights = np.ones(M) / M  # 默认均匀分布
 
     # 计算 p(Y | C_i) (先验观测概率)
     p_y_given_C = np.zeros((M, Y.shape[0]))
     for i in range(M):
-        cov_i = sigmas[i] + sigmaN
-        p_y_given_C[i] = multivariate_normal.pdf(Y, mean=means[i], cov=cov_i)
+        cov_i = A @ sigmas[i] @ A.T + sigmaN
+        p_y_given_C[i] = multivariate_normal.pdf(Y, mean=A @ means[i], cov=cov_i)
 
     # 计算 p(C_i | Y) (后验概率)
     weighted_p_y_given_C = p_y_given_C * weights[:, None]  # 乘以 GMM 先验权重
     p_C_given_Y = weighted_p_y_given_C / np.sum(weighted_p_y_given_C, axis=0, keepdims=True)
 
     # 计算投影后的 1D 高斯参数 (均值 & 方差)
-    mu_x_given_y = np.zeros((M, Y.shape[0]))  # 存储投影均值
-    sigma_x_given_y = np.zeros(M)  # 存储投影方差
+    mu_x_given_y = np.zeros((M, Y.shape[0]))  # (M, N)
+    sigma_x_given_y = np.zeros((M,))  # (M,)
 
     for i in range(M):
-        inv_cov_i = np.linalg.inv(sigmas[i] + sigmaN)
-        mu_x_given_y[i] = np.dot(v, means[i].reshape(-1, 1) + sigmas[i] @ inv_cov_i @ (Y.T - means[i].reshape(-1, 1)))
-        sigma_x_given_y[i] = np.dot(v, (sigmas[i] - sigmas[i] @ inv_cov_i @ sigmas[i]) @ v)
+        inv_term = np.linalg.inv(A @ sigmas[i] @ A.T + sigmaN)  # (d', d')
+        mu_x_given_y[i] = np.dot(v, means[i].reshape(-1, 1) + sigmas[i] @ A.T @ inv_term @ (Y.T - A @ means[i].reshape(-1, 1)))
+        sigma_x_given_y[i] = np.dot(v, (sigmas[i] - sigmas[i] @ A.T @ inv_term @ A @ sigmas[i]) @ v)
 
     # 计算投影后的 1D GMM 概率密度
     p_x_given_y = np.zeros((M, Y.shape[0], N))
