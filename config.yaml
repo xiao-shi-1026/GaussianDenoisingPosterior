@@ -11,8 +11,8 @@ loss:
   name: mse
 
 path:
-  input: C:\Users\sx119\Desktop\GaussianDenoisingPosterior
-  output: C:\Users\sx119\Desktop\GaussianDenoisingPosterior\outputs\deblurring
+  input: data/ffhq256
+  output: outputs/deblurring
 
 hyperparameter:
   epochs: 40
@@ -24,7 +24,7 @@ num_workers:
 
 
 net:
-  name: "UNet"
+  name: "DnCNN"
 
 seed:
   number: 42
