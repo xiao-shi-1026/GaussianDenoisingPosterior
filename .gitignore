@@ -5,6 +5,8 @@ val.h5
 outputs/deblurring/deblurring_5_5.pth
 outputs/deblurring/deblurring.pth
 outputs/deblurring/deblurring_15_15.pth
+outputs/inpainting_unet.pth
+outputs/inpainting_unet_2.pth
 data/imagenet_freeform3040_masks.npz
 data/imagenet_freeform2030_masks.npz
 data/imagenet_freeform1020_masks.npz

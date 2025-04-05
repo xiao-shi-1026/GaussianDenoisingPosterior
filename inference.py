@@ -9,6 +9,7 @@ from data.blurring import corrupt
 from collections import OrderedDict
 import torch.nn.functional as F
 from data.utils import addnoise
+from data.inpaint import build_inpaint_freeform
 def load_model(model_class, model_path, device):
     model = model_class()
     checkpoint = torch.load(model_path, map_location="cpu")
@@ -41,15 +42,23 @@ def postprocess_output(output_tensor):
     return Image.fromarray(output_image)
 
 def inference_pipeline(model_path, image_path, device="cuda"):
+
+    class Opt:
+        image_size = 256
+        device = device
+    opt = Opt()
+    mask_type = 'freeform1020' 
+    inpaint_fn = build_inpaint_freeform(opt, mask_type)
+
     model = load_model(UNet, model_path, device)
 
     input_tensor, original_image = preprocess_image(image_path)
 
     input_tensor = input_tensor.to(device)
 
-    corrupted_tensor = corrupt(input_tensor, device)
+    corrupted_tensor,_ = inpaint_fn(input_tensor)
 
-    corrupted_tensor = addnoise(corrupted_tensor, [25, 25],device)
+    corrupted_tensor = addnoise(corrupted_tensor, [5, 5],device)
 
     denoised_tensor = run_inference(model, corrupted_tensor, device)
 
@@ -106,7 +115,8 @@ def plot_real(original_image, denoised_image):
 
 
 if __name__ == "__main__":
-    model_path = r"C:\Users\sx119\Desktop\GaussianDenoisingPosterior\outputs\deblurring\deblurring.pth"
+
+    model_path = r"C:\Users\sx119\Desktop\GaussianDenoisingPosterior\outputs\inpainting_unet.pth"
     image_path = r"C:\Users\sx119\Desktop\GaussianDenoisingPosterior\data\test_image_toy.png"
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     # real_inference(model_path, image_path, device)

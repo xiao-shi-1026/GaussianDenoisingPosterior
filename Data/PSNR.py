@@ -17,7 +17,7 @@ def calculate_psnr_torch(img1: torch.Tensor, img2: torch.Tensor, max_pixel: floa
         return float('inf')
     return 10 * torch.log10((max_pixel ** 2) / mse)
 
-def evaluate_psnr_torch(val_loader: DataLoader, device: torch.device) -> float:
+def evaluate_psnr_torch(val_loader: DataLoader, model: torch.nn.Module, device: torch.device) -> float:
     """
     This function evaluates the average psnr of the validation dataset.
     params:
@@ -28,23 +28,18 @@ def evaluate_psnr_torch(val_loader: DataLoader, device: torch.device) -> float:
     """
     total_psnr = 0.0
     count = 0
+    model.eval()
+    with torch.no_grad():
+        for inputs, labels in val_loader:
+            inputs, labels = inputs.to(device), labels.to(device)
+            outputs = model(inputs)
 
-    for original, reconstructed in val_loader:
-        original, reconstructed = original.to(device), reconstructed.to(device)
-
-        # change this
-        reconstructed = corrupt(reconstructed, device)
-
-        batch_psnr = torch.mean(torch.stack([calculate_psnr_torch(orig, recon) for orig, recon in zip(original, reconstructed)]))
-        total_psnr += batch_psnr.item()
-        count += 1
+            batch_psnr = torch.mean(torch.stack([
+                calculate_psnr_torch(gt, recon) 
+                for gt, recon in zip(labels, outputs)
+            ]))
+            total_psnr += batch_psnr.item()
+            count += 1
 
     return total_psnr / count
-
-if __name__ == '__main__':
-    # test
-    test_dataset = ImageDataset(r'C:\Users\sx119\Desktop\GaussianDenoisingPosterior\data\sample_data')
-    test_loader = DataLoader(dataset=test_dataset, batch_size=3, shuffle=False, num_workers=1)
-    result = evaluate_psnr_torch(test_loader, "cuda" if torch.cuda.is_available() else "cpu")
-    print(result)
 

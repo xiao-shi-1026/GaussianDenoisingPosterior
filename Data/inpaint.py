@@ -107,10 +107,8 @@ def get_center_mask(image_size):
     mask = bbox2mask(image_size, (h//4, w//4, h//2, w//2))
     return torch.from_numpy(mask).permute(2,0,1)
 
-def build_inpaint_center(opt, log, mask_type):
+def build_inpaint_center(opt, mask_type):
     assert mask_type == "center"
-
-    log.info(f"[Corrupt] Inpaint: {mask_type=}  ...")
 
     center_mask = get_center_mask([opt.image_size, opt.image_size])[None,...] # [1,1,256,256]
     center_mask = center_mask.to(opt.device)
@@ -123,10 +121,8 @@ def build_inpaint_center(opt, log, mask_type):
 
     return inpaint_center
 
-def build_inpaint_freeform(opt, log, mask_type):
+def build_inpaint_freeform(opt, mask_type):
     assert "freeform" in mask_type
-
-    log.info(f"[Corrupt] Inpaint: {mask_type=}  ...")
 
     freeform_masks = load_freeform_masks(mask_type) # [10000, 1, 256, 256]
     n_freeform_masks = freeform_masks.shape[0]
@@ -149,9 +145,6 @@ if __name__ == '__main__':
         device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
     
-    class Log:
-        def info(self, msg): print(msg)
-
     def show_image(tensor, title="Image"):
         tensor = tensor.squeeze(0).detach().cpu()  # [3,H,W]
         tensor = (tensor * 0.5 + 0.5).clamp(0, 1)  # [-1,1] -> [0,1]
@@ -162,20 +155,22 @@ if __name__ == '__main__':
         plt.show()
 
     opt = Opt()
-    log = Log()
-    path = 'data/sample_data/test_image_1.png'
-    image = Image.open(path).convert("RGB")
+    path = 'data/sample_data'
+
     transform = T.Compose([
         T.Resize((256, 256)),
         T.ToTensor(),  # [0,1]
         T.Normalize(mean=[0.5]*3, std=[0.5]*3),  # 归一化到 [-1,1]
     ])
     mask_type = 'freeform3040' 
-    img = transform(image).unsqueeze(0).to('cuda')
-    inpaint_fn = build_inpaint_freeform(opt, log, mask_type)
-    corrupted_img, mask = inpaint_fn(img)
+    inpaint_fn = build_inpaint_freeform(opt, mask_type)
+    for filename in os.listdir(path):
+        if not filename.lower().endswith(('.jpg', '.png', '.jpeg')):
+            continue
 
-
-    
-    show_image(img, "Original Image")
-    show_image(corrupted_img, "Corrupted Image")
+        img_path = os.path.join(path, filename)
+        image = Image.open(img_path).convert("RGB")
+        img = transform(image).unsqueeze(0).to('cuda')
+        corrupted_img, mask = inpaint_fn(img)
+        show_image(img, "Original Image")
+        show_image(corrupted_img, "Corrupted Image")

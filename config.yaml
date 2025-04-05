@@ -17,14 +17,21 @@ path:
 hyperparameter:
   epochs: 40
   train_batch: 16
-  vali_batch: 16
+  vali_batch: 4
 
 num_workers:
-  num: 4
-
+  num: 0
 
 net:
-  name: "DnCNN"
+  name: "UNet" # DnCNN or UNet
 
 seed:
   number: 42
+
+subproblem: # SR(super resolution), IP(inpaint)
+  name: "IP"
+
+server: # YES - on server, NO, local
+  status: "NO"
+
+augmentation: "NO"
