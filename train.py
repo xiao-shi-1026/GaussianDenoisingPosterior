@@ -98,14 +98,7 @@ if __name__ == '__main__':
     best_val_loss = float('inf')
 
     if config_dict['subproblem'] == 'IP':
-        from data.inpaint import build_inpaint_freeform
-        class Opt:
-            image_size = 256
-            device = config_dict['device']
-
-        opt = Opt()
-        mask_type = 'freeform1020' 
-        inpaint_fn = build_inpaint_freeform(opt, mask_type)
+        from data.inpaint import generate_mask, apply_mask
 
 for epoch in range(num_epochs):
     print(f"Starting epoch {epoch + 1}/{num_epochs}")
@@ -123,7 +116,9 @@ for epoch in range(num_epochs):
     for batch_idx, (inputs, labels) in enumerate(train_loader):
         inputs, labels = inputs.to(config_dict['device']), labels.to(config_dict['device'])
         if config_dict['subproblem'] == 'IP':
-            inputs, _ = inpaint_fn(inputs)
+            mask = generate_mask(inputs.size()[0], (inputs.size()[2], inputs.size()[3]), drop_ratio=0.15, RGB=True)
+            mask = mask.to(config_dict['device'])
+            inputs = apply_mask(inputs, mask)
             inputs = inputs.to(config_dict['device'])
         inputs = addnoise(inputs, [5, 5], config_dict['device'])
         outputs = model(inputs)
@@ -153,8 +148,9 @@ for epoch in range(num_epochs):
         for batch_idx, (inputs, labels) in enumerate(test_loader):
             inputs, labels = inputs.to(config_dict['device']), labels.to(config_dict['device'])
             if config_dict['subproblem'] == 'IP':
-                inputs, _ = inpaint_fn(inputs)
-                inputs = inputs.to(config_dict['device'])
+                mask = generate_mask(inputs.size()[0], (inputs.size()[2], inputs.size()[3]), drop_ratio=0.15, RGB=True)
+                mask = mask.to(config_dict['device'])
+                inputs = apply_mask(inputs, mask)
             inputs = addnoise(inputs, [5, 5], config_dict['device'])
             outputs = model(inputs)
             loss = criterion(outputs, labels) / (inputs.size()[0]*2)
